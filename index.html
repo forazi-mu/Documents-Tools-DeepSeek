@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #1abc9c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+        
+        .dashboard-nav {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1rem;
+            height: 100%;
+        }
+        
+        .nav-link {
+            color: var(--dark-color);
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        .recent-activity-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .recent-activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .badge-custom {
+            padding: 0.5em 0.8em;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-container input {
+            padding-right: 40px;
+            border-radius: 50px;
+        }
+        
+        .search-container i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+        
+        .btn-custom {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-custom:hover {
+            background-color: #16a085;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.25);
+        }
+        
+        .dashboard-footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+        
+        .document-preview {
+            background-color: white;
+            min-height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            overflow: auto;
+        }
+        
+        .document-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-card {
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            height: 100%;
+        }
+        
+        .file-card:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-color);
+        }
+        
+        .file-icon {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-meta {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .tab-content {
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: 0;
+            margin-bottom: 0;
+            background: transparent;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: transparent;
+            color: var(--accent-color);
+            border-bottom: 3px solid var(--accent-color);
+        }
+        
+        .log-entry {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-time {
+            font-weight: 600;
+            color: var(--secondary-color);
+            min-width: 120px;
+        }
+        
+        .log-action {
+            flex-grow: 1;
+            padding: 0 1rem;
+        }
+        
+        .preview-document {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow: auto;
+        }
+        
+        .lc-record {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lc-record:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-color: var(--accent-color);
+        }
+        
+        .lc-record h5 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .record-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .file-tab {
+            display: none;
+        }
+        
+        .file-tab.active {
+            display: block;
+        }
+        
+        .file-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .document-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .document-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .document-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .preview-container {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        .preview-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-nav {
+                margin-bottom: 1.5rem;
+            }
+            
+            .stat-card {
+                margin-bottom: 1rem;
+            }
+            
+            .search-container {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .record-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="d-flex align-items-center mb-2 mb-md-0">
+                    <div class="navbar-brand"><i class="fas fa-file-contract"></i> DocManager Pro</div>
+                </div>
+                <div class="d-flex flex-column flex-md-row align-items-center w-100 w-md-auto">
+                    <div class="search-container mb-2 mb-md-0 me-md-3">
+                        <input type="text" class="form-control" id="globalSearch" placeholder="Search records...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="d-flex">
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i> Admin
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="d-flex mt-2 mt-md-0">
+                <ul class="nav">
+                    <li class="nav-item"><a href="#" class="nav-link text-white active" data-section="dashboard"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link text-white" data-section="dataEntry"><i class="fas fa-edit me-1"></i> Data Entry</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link text-white" data-section="generatedFiles"><i class="fas fa-folder me-1"></i> Generated Files</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link text-white" data-section="activityLog"><i class="fas fa-history me-1"></i> Activity Log</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        <!-- Dashboard Section -->
+        <section id="dashboardSection" class="section active">
+            <div class="row">
+                <!-- Sidebar Navigation -->
+                <div class="col-lg-3 mb-4">
+                    <div class="dashboard-nav">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" data-section="dashboard">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="lc">
+                                    <i class="fas fa-file-invoice"></i> LC Documents
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="supplier">
+                                    <i class="fas fa-box"></i> Supplier Packing
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="adjustment">
+                                    <i class="fas fa-list-alt"></i> Adjustment List
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="value">
+                                    <i class="fas fa-calculator"></i> Value Sheet
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="shipping">
+                                    <i class="fas fa-ship"></i> Shipping Info
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="generatedFiles">
+                                    <i class="fas fa-file-export"></i> Generated Files
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Content -->
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Document Management Dashboard</h5>
+                                    <div>
+                                        <button class="btn btn-light btn-sm me-2" id="refreshData"><i class="fas fa-sync-alt"></i></button>
+                                        <button class="btn btn-custom btn-sm" id="newDocument">New Document</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3 mb-3 mb-md-0">
+                                            <div class="stat-card">
+                                                <div class="stat-icon">
+                                                    <i class="fas fa-file-contract"></i>
+                                                </div>
+                                                <div class="stat-number" id="lcCount">0</div>
+                                                <div class="stat-label">LC Records</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-3 mb-md-0">
+                                            <div class="stat-card">
+                                                <div class="stat-icon">
+                                                    <i class="fas fa-file-invoice-dollar"></i>
+                                                </div>
+                                                <div class="stat-number" id="invoiceCount">0</div>
+                                                <div class="stat-label">Supplier Invoices</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-3 mb-md-0">
+                                            <div class="stat-card">
+                                                <div class="stat-icon">
+                                                    <i class="fas fa-file-export"></i>
+                                                </div>
+                                                <div class="stat-number" id="fileCount">0</div>
+                                                <div class="stat-label">Generated Files</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="stat-card">
+                                                <div class="stat-icon">
+                                                    <i class="fas fa-tasks"></i>
+                                                </div>
+                                                <div class="stat-number" id="taskCount">0</div>
+                                                <div class="stat-label">Pending Tasks</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-8">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Quick Actions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <button class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3">
+                                                <i class="fas fa-file-invoice fs-2 mb-2"></i>
+                                                <span>New LC</span>
+                                            </button>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <button class="btn btn-outline-success w-100 d-flex flex-column align-items-center py-3">
+                                                <i class="fas fa-file-import fs-2 mb-2"></i>
+                                                <span>Import Data</span>
+                                            </button>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <button class="btn btn-outline-info w-100 d-flex flex-column align-items-center py-3">
+                                                <i class="fas fa-file-export fs-2 mb-2"></i>
+                                                <span>Export Reports</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Recent Activity</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="recentActivity">
+                                        <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+                                            <div class="text-center text-muted">
+                                                <i class="fas fa-history fs-1 mb-3"></i>
+                                                <p>No recent activity</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Generate Files</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-6 col-lg-12 col-xl-6 mb-3">
+                                            <div class="file-card" data-file="detailsList">
+                                                <div class="file-icon">
+                                                    <i class="fas fa-list"></i>
+                                                </div>
+                                                <div class="file-name">Details List</div>
+                                                <div class="file-meta">From Adjustment List</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-lg-12 col-xl-6 mb-3">
+                                            <div class="file-card" data-file="bl">
+                                                <div class="file-icon">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </div>
+                                                <div class="file-name">B/L</div>
+                                                <div class="file-meta">Bill of Lading</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-lg-12 col-xl-6 mb-3">
+                                            <div class="file-card" data-file="co">
+                                                <div class="file-icon">
+                                                    <i class="fas fa-certificate"></i>
+                                                </div>
+                                                <div class="file-name">C/O</div>
+                                                <div class="file-meta">Certificate of Origin</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-lg-12 col-xl-6 mb-3">
+                                            <div class="file-card" data-file="ci">
+                                                <div class="file-icon">
+                                                    <i class="fas fa-receipt"></i>
+                                                </div>
+                                                <div class="file-name">Commercial Invoice</div>
+                                                <div class="file-meta">CI Document</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">System Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Storage</span>
+                                            <span>25% used</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 25%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Database</span>
+                                            <span>Active</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Last Backup</span>
+                                            <span>Today, 02:00 AM</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: 100%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Entry Section -->
+        <section id="dataEntrySection" class="section">
+            <div class="row">
+                <div class="col-lg-3 mb-4">
+                    <div class="dashboard-nav">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="dashboard">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" data-content="lc">
+                                    <i class="fas fa-file-invoice"></i> LC Documents
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="supplier">
+                                    <i class="fas fa-box"></i> Supplier Packing
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="adjustment">
+                                    <i class="fas fa-list-alt"></i> Adjustment List
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="value">
+                                    <i class="fas fa-calculator"></i> Value Sheet
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-content="shipping">
+                                    <i class="fas fa-ship"></i> Shipping Info
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-9">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Data Entry</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="dataEntryTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="lc-tab" data-bs-toggle="tab" data-bs-target="#lc" type="button" role="tab">LC Documents</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="supplier-tab" data-bs-toggle="tab" data-bs-target="#supplier" type="button" role="tab">Supplier Packing</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab">Shipping Info</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="dataEntryContent">
+                                <!-- LC Documents Tab -->
+                                <div class="tab-pane fade show active" id="lc" role="tabpanel" aria-labelledby="lc-tab">
+                                    <form id="lcForm">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Select LC Number</label>
+                                                <select class="form-select" id="lcSelect">
+                                                    <option value="" selected>Select existing LC</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Partial Shipment #</label>
+                                                <input type="text" class="form-control" id="partialShipment" placeholder="Enter Part No.">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">LC Number</label>
+                                            <input type="text" class="form-control" id="lcNumber" placeholder="Enter LC Number" required>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">LC Date</label>
+                                                <input type="date" class="form-control" id="lcDate" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">LC Amount</label>
+                                                <input type="text" class="form-control" id="lcAmount" placeholder="Enter Amount" required>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">PI Number</label>
+                                                <input type="text" class="form-control" id="piNumber" placeholder="Enter PI Number" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">PI Date</label>
+                                                <input type="date" class="form-control" id="piDate" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-secondary me-2" id="resetLcForm">Reset</button>
+                                            <button type="submit" class="btn btn-custom">Save & Continue</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Supplier Packing Tab -->
+                                <div class="tab-pane fade" id="supplier" role="tabpanel" aria-labelledby="supplier-tab">
+                                    <form id="supplierForm">
+                                        <div class="mb-3">
+                                            <label class="form-label">Supplier Name</label>
+                                            <input type="text" class="form-control" id="supplierName" placeholder="Enter Supplier Name" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Loading Date</label>
+                                            <input type="date" class="form-control" id="loadingDate" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Upload Packing List (Excel)</label>
+                                            <input type="file" class="form-control" id="packingListFile" accept=".xlsx, .xls" required>
+                                            <div class="form-text">Upload Excel file for Warehouse List and Supplier Invoice generation</div>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-secondary me-2" id="resetSupplierForm">Reset</button>
+                                            <button type="submit" class="btn btn-custom">Process File</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Shipping Info Tab -->
+                                <div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="shipping-tab">
+                                    <form id="shippingForm">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Item Description</label>
+                                                <input type="text" class="form-control" id="itemDescription" placeholder="Enter Description" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">H.S. Code</label>
+                                                <input type="text" class="form-control" id="hsCode" placeholder="Enter H.S. Code" required>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Total CTN Quantity</label>
+                                                <input type="number" class="form-control" id="ctnQuantity" placeholder="Enter Quantity" required>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Total Gross Weight</label>
+                                                <input type="text" class="form-control" id="grossWeight" placeholder="Enter Weight" required>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Container Size</label>
+                                                <select class="form-select" id="containerSize" required>
+                                                    <option value="">Select size</option>
+                                                    <option value="20">20 ft</option>
+                                                    <option value="40">40 ft</option>
+                                                    <option value="40hc">40 ft HC</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">CI Number</label>
+                                                <input type="text" class="form-control" id="ciNumber" placeholder="Enter CI Number" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">CI Date</label>
+                                                <input type="date" class="form-control" id="ciDate" required>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Loading Port</label>
+                                                <input type="text" class="form-control" id="loadingPort" placeholder="Enter Port" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Discharge Port</label>
+                                                <input type="text" class="form-control" id="dischargePort" placeholder="Enter Port" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-secondary me-2" id="resetShippingForm">Reset</button>
+                                            <button type="submit" class="btn btn-custom">Generate Documents</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Generated Files Section -->
+        <section id="generatedFilesSection" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Generated Files</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-4">
+                        <div class="d-flex">
+                            <button class="btn btn-outline-primary me-2 active-file-filter" data-filter="all">All Files</button>
+                            <button class="btn btn-outline-secondary me-2" data-filter="recent">Recent</button>
+                            <button class="btn btn-outline-secondary" data-filter="pending">Pending</button>
+                        </div>
+                        <div>
+                            <button class="btn btn-custom" id="generateNewFile">
+                                <i class="fas fa-plus me-1"></i> Generate New
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="document-table">
+                            <thead>
+                                <tr>
+                                    <th>Document Name</th>
+                                    <th>Type</th>
+                                    <th>LC Number</th>
+                                    <th>Date Generated</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="filesTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <i class="fas fa-folder-open fs-1 text-muted mb-3"></i>
+                                        <p>No files generated yet</p>
+                                        <button class="btn btn-custom mt-2" id="generateFirstFile">Generate Your First File</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Activity Log Section -->
+        <section id="activityLogSection" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Activity Log</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <label class="form-label">Filter by:</label>
+                            </div>
+                            <div class="me-3">
+                                <select class="form-select" id="logFilter">
+                                    <option value="all">All Activities</option>
+                                    <option value="creation">Document Creation</option>
+                                    <option value="edit">Document Editing</option>
+                                    <option value="generate">File Generation</option>
+                                </select>
+                            </div>
+                            <div>
+                                <input type="date" class="form-control" id="logDate">
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-download me-1"></i> Export Log
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="log-list">
+                        <div class="text-center py-5">
+                            <i class="fas fa-clipboard-list fs-1 text-muted mb-3"></i>
+                            <p>No activities recorded yet</p>
+                            <p class="text-muted">Your document activities will appear here once you start using the system</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5>Document Management System</h5>
+                    <p class="mb-0">Streamline your document workflow with our comprehensive management solution</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <ul class="list-inline mb-0">
+                        <li class="list-inline-item"><a href="#" class="text-white">Operation Manual</a></li>
+                        <li class="list-inline-item"><a href="#" class="text-white">Support</a></li>
+                        <li class="list-inline-item"><a href="#" class="text-white">Contact</a></li>
+                    </ul>
+                    <p class="mb-0 mt-2">Version 1.0.0</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Main application state
+        const appState = {
+            currentSection: 'dashboard',
+            lcRecords: [],
+            generatedFiles: [],
+            activities: []
+        };
+
+        // DOM elements
+        const elements = {
+            sections: document.querySelectorAll('.section'),
+            navLinks: document.querySelectorAll('.nav-link[data-section], .nav-link[data-content]'),
+            globalSearch: document.getElementById('globalSearch'),
+            lcForm: document.getElementById('lcForm'),
+            supplierForm: document.getElementById('supplierForm'),
+            shippingForm: document.getElementById('shippingForm'),
+            filesTableBody: document.getElementById('filesTableBody'),
+            generateFirstFile: document.getElementById('generateFirstFile'),
+            resetButtons: document.querySelectorAll('[id^="reset"]'),
+            lcSelect: document.getElementById('lcSelect')
+        };
+
+        // Initialize the application
+        function initApp() {
+            setupEventListeners();
+            updateDashboardStats();
+            updateLCSelect();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Navigation
+            elements.navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const section = this.getAttribute('data-section');
+                    const content = this.getAttribute('data-content');
+                    
+                    if (section) {
+                        switchSection(section);
+                    } else if (content) {
+                        showContent(content);
+                    }
+                    
+                    // Update active nav links
+                    document.querySelectorAll('.nav-link').forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // Form submissions
+            elements.lcForm.addEventListener('submit', handleLCFormSubmit);
+            elements.supplierForm.addEventListener('submit', handleSupplierFormSubmit);
+            elements.shippingForm.addEventListener('submit', handleShippingFormSubmit);
+            
+            // Reset buttons
+            elements.resetButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const formId = this.id.replace('reset', '').toLowerCase() + 'Form';
+                    document.getElementById(formId).reset();
+                });
+            });
+            
+            // Generate first file button
+            elements.generateFirstFile.addEventListener('click', function() {
+                switchSection('dataEntry');
+            });
+            
+            // Global search
+            elements.globalSearch.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    const searchTerm = this.value.trim();
+                    if (searchTerm) {
+                        alert(`Searching for: ${searchTerm}\nThis would search through all records in a real application.`);
+                        this.value = '';
+                    }
+                }
+            });
+        }
+
+        // Switch between main sections
+        function switchSection(sectionId) {
+            appState.currentSection = sectionId;
+            
+            elements.sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId + 'Section').classList.add('active');
+        }
+
+        // Show specific content within a section
+        function showContent(contentId) {
+            // In a real app, this would show specific content
+            // For this demo, we just switch to the data entry section
+            switchSection('dataEntry');
+            
+            // Activate the corresponding tab
+            const tabButton = document.getElementById(contentId + '-tab');
+            if (tabButton) {
+                tabButton.click();
+            }
+        }
+
+        // Handle LC form submission
+        function handleLCFormSubmit(e) {
+            e.preventDefault();
+            
+            const lcRecord = {
+                number: document.getElementById('lcNumber').value,
+                date: document.getElementById('lcDate').value,
+                amount: document.getElementById('lcAmount').value,
+                piNumber: document.getElementById('piNumber').value,
+                piDate: document.getElementById('piDate').value,
+                partialShipment: document.getElementById('partialShipment').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            appState.lcRecords.push(lcRecord);
+            updateDashboardStats();
+            updateLCSelect();
+            
+            // Add activity
+            addActivity(`Created new LC record: ${lcRecord.number}`);
+            
+            alert('LC record saved successfully!');
+            this.reset();
+        }
+
+        // Handle supplier form submission
+        function handleSupplierFormSubmit(e) {
+            e.preventDefault();
+            
+            const supplierData = {
+                name: document.getElementById('supplierName').value,
+                loadingDate: document.getElementById('loadingDate').value,
+                fileName: document.getElementById('packingListFile').files[0]?.name || 'No file',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Add activity
+            addActivity(`Processed supplier packing list for: ${supplierData.name}`);
+            
+            alert('Supplier data processed successfully!');
+            this.reset();
+        }
+
+        // Handle shipping form submission
+        function handleShippingFormSubmit(e) {
+            e.preventDefault();
+            
+            const shippingData = {
+                itemDescription: document.getElementById('itemDescription').value,
+                hsCode: document.getElementById('hsCode').value,
+                ctnQuantity: document.getElementById('ctnQuantity').value,
+                grossWeight: document.getElementById('grossWeight').value,
+                containerSize: document.getElementById('containerSize').value,
+                ciNumber: document.getElementById('ciNumber').value,
+                ciDate: document.getElementById('ciDate').value,
+                loadingPort: document.getElementById('loadingPort').value,
+                dischargePort: document.getElementById('dischargePort').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Generate files
+            generateFiles(shippingData);
+            
+            // Add activity
+            addActivity(`Generated shipping documents for CI: ${shippingData.ciNumber}`);
+            
+            alert('Shipping documents generated successfully!');
+            this.reset();
+        }
+
+        // Generate files based on shipping data
+        function generateFiles(shippingData) {
+            const fileTypes = [
+                'B/L', 'C/O', 'Commercial Invoice', 'Packing List', 
+                'Warehouse List', 'Supplier Invoice'
+            ];
+            
+            fileTypes.forEach(type => {
+                const file = {
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    name: `${type} - ${shippingData.ciNumber}`,
+                    type: type,
+                    lcNumber: appState.lcRecords.length > 0 ? appState.lcRecords[0].number : 'N/A',
+                    date: new Date().toLocaleDateString(),
+                    status: 'Generated',
+                    timestamp: new Date().toISOString()
+                };
+                
+                appState.generatedFiles.push(file);
+            });
+            
+            updateDashboardStats();
+        }
+
+        // Add activity to log
+        function addActivity(action) {
+            const activity = {
+                action: action,
+                timestamp: new Date().toISOString()
+            };
+            
+            appState.activities.unshift(activity);
+            updateDashboardStats();
+        }
+
+        // Update dashboard statistics
+        function updateDashboardStats() {
+            document.getElementById('lcCount').textContent = appState.lcRecords.length;
+            document.getElementById('fileCount').textContent = appState.generatedFiles.length;
+            document.getElementById('invoiceCount').textContent = appState.lcRecords.length; // Simplified for demo
+            document.getElementById('taskCount').textContent = appState.generatedFiles.length > 0 ? 0 : 1; // Simplified
+        }
+
+        // Update LC select dropdown
+        function updateLCSelect() {
+            const select = elements.lcSelect;
+            select.innerHTML = '<option value="" selected>Select existing LC</option>';
+            
+            appState.lcRecords.forEach(record => {
+                const option = document.createElement('option');
+                option.value = record.number;
+                option.textContent = record.number;
+                select.appendChild(option);
+            });
+        }
+
+        // Initialize the application when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
